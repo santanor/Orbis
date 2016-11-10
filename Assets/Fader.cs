@@ -19,21 +19,24 @@ public class Fader : MonoBehaviour {
         if (PlayOnAwake)
         {
             isFading = true;
+            RenderTarget.color = new Color(RenderTarget.color.r, RenderTarget.color.g, RenderTarget.color.b, SourceAlpha);
         }
+        currentAlpha = SourceAlpha;
 	}
 
     void Update()
     {
         if (isFading)
         {
-            currentAlpha = Mathf.Lerp(SourceAlpha, TargetAlpha, Delta);
+            currentAlpha = Mathf.Lerp(currentAlpha, TargetAlpha, Delta);
             if (Loop)
             {
-                if (Mathf.Abs(SourceAlpha - TargetAlpha) <= 0.05f)
+                if (Mathf.Abs(SourceAlpha - TargetAlpha) <= Delta)
                 {
                     var swap = SourceAlpha;
                     SourceAlpha = TargetAlpha;
                     TargetAlpha = swap;
+                    currentAlpha = SourceAlpha;
                 }
             }
             else
