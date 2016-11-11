@@ -14,6 +14,7 @@ public class UIManager : MonoBehaviour {
     public GameObject FirstStar;
     public GameObject SecondStar;
     public GameObject ThirdStar;
+    public Text LevelText;
     private int CurrentLevel;
 
 	// Use this for initialization
@@ -38,7 +39,8 @@ public class UIManager : MonoBehaviour {
     private IEnumerator LevelEnded(LevelManager.LevelStarsEnum stars)
     {
         yield return new WaitForSeconds(1.5f);
-        LevelEndPanel.SetActive(true);        
+        LevelEndPanel.SetActive(true);
+        LevelText.text = "Level " + SceneManager.GetActiveScene().buildIndex + " cleared ";  
         FirstStar.SetActive(true);
         if (stars == LevelManager.LevelStarsEnum.TwoStars)
             SecondStar.SetActive(true);
