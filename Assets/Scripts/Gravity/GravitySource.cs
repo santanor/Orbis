@@ -4,10 +4,11 @@ using System.Collections.Generic;
 
 public class GravitySource : MonoBehaviour {
 
-    public delegate void GravityPulseAction(Vector3 pullSource, float gravityPull);
+    public delegate void GravityPulseAction(Vector3 pullSource, float gravityPull, float radius);
     public GravityPulseAction OnGravityPulse;
 
     public float GravitationalPullForce = 1;
+    public float radius = 0.03f;
 
 	// Use this for initialization
 	void Start () {
@@ -18,7 +19,7 @@ public class GravitySource : MonoBehaviour {
     {
         if(OnGravityPulse != null)
         {
-            OnGravityPulse(transform.position, GravitationalPullForce);
+            OnGravityPulse(transform.position, GravitationalPullForce, radius);
         }
     }
     

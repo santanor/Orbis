@@ -4,7 +4,7 @@ using Assets.Scripts.Planet;
 
 public class LevelManager : MonoBehaviour {
 
-    public enum LevelStarsEnum { OneStar, TwoStars, ThreeStars}
+    public enum LevelStarsEnum { ZeroStars, OneStar, TwoStars, ThreeStars}
 
     public delegate void LevelBeganAction(int pointsCount);
     public delegate void LevelEndedAction(LevelStarsEnum stars);
@@ -14,6 +14,7 @@ public class LevelManager : MonoBehaviour {
     public SlingshotManager slingShotManager;
     public int ThreeStarCap;
     public int TwoStarCap;
+    public int OneStarCap;
     private int pointsCount;
     private int planetCount;
     private Point[] points;
@@ -23,6 +24,8 @@ public class LevelManager : MonoBehaviour {
     void Start () {
         var points = FindObjectsOfType< Point > ();
         pointsCount = points.Length;
+        if (OneStarCap == 0)
+            OneStarCap = pointsCount;
         foreach(var p in points)
         {
             p.OnPointCollected += OnPointCollected;
@@ -53,8 +56,12 @@ public class LevelManager : MonoBehaviour {
             {
                 levelStars = LevelStarsEnum.TwoStars;
             }
-            else
+            else if(planetCount < OneStarCap)
+            {
                 levelStars = LevelStarsEnum.OneStar;
+            }
+            else
+                levelStars = LevelStarsEnum.ZeroStars;
 
             if (OnLevelEnded != null)
                 OnLevelEnded(levelStars);

@@ -14,6 +14,7 @@ public class UIManager : MonoBehaviour {
     public GameObject FirstStar;
     public GameObject SecondStar;
     public GameObject ThirdStar;
+    public GameObject NextLevelButton;
     public Text LevelText;
     private int CurrentLevel;
 
@@ -41,11 +42,26 @@ public class UIManager : MonoBehaviour {
         yield return new WaitForSeconds(1.5f);
         LevelEndPanel.SetActive(true);
         LevelText.text = "Level " + SceneManager.GetActiveScene().buildIndex + " cleared ";  
-        FirstStar.SetActive(true);
-        if (stars == LevelManager.LevelStarsEnum.TwoStars)
+        
+        if(stars == LevelManager.LevelStarsEnum.ZeroStars)
+        {
+            NextLevelButton.GetComponent<Button>().interactable = false;
+            var txt = NextLevelButton.GetComponentInChildren<Text>();
+            txt.text = "Get at least one star";
+            txt.resizeTextForBestFit = true;
+        }
+        else if(stars == LevelManager.LevelStarsEnum.OneStar)
+        {
+            FirstStar.SetActive(true);
+        }
+        else if (stars == LevelManager.LevelStarsEnum.TwoStars)
+        {
+            FirstStar.SetActive(true);
             SecondStar.SetActive(true);
+        }
         else if (stars == LevelManager.LevelStarsEnum.ThreeStars)
         {
+            FirstStar.SetActive(true);
             SecondStar.SetActive(true);
             ThirdStar.SetActive(true);
         }
@@ -61,4 +77,8 @@ public class UIManager : MonoBehaviour {
         SceneManager.LoadScene(CurrentLevel + 1); 
     }
 
+    public void RestartLevel()
+    {
+        SceneManager.LoadScene(CurrentLevel);
+    }
 }

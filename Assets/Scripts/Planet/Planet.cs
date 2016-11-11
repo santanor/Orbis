@@ -15,11 +15,13 @@ namespace Assets.Scripts.Planet
         private PlanetStatus planetStatus;
         private Rigidbody2D rigbody2D;
         private SpriteRenderer spriteRenderer;
+        private DistanceJoint2D joint;
         private Collider2D collider2D;
         private float lastPredictedParticleTime;
 
         void Start()
         {
+            joint = GetComponent<DistanceJoint2D>();
             rigbody2D = GetComponent<Rigidbody2D>();
             spriteRenderer = GetComponent<SpriteRenderer>();
             this.collider2D = GetComponent<Collider2D>();
@@ -37,16 +39,19 @@ namespace Assets.Scripts.Planet
             {
                 col.enabled = true;
             }
-            this.rigbody2D.AddForce(gravityPull.normalized * force
-                , ForceMode2D.Force);
-            var particles = GetComponentsInChildren<PlanetTrayectoryPredictor>();
-            foreach(var p in particles) 
+            if(this.rigbody2D != null)
             {
-                DestroyImmediate(p.gameObject);
-            } 
+                this.rigbody2D.AddForce(gravityPull.normalized * force
+                , ForceMode2D.Force);
+                var particles = GetComponentsInChildren<PlanetTrayectoryPredictor>();
+                foreach (var p in particles)
+                {
+                    DestroyImmediate(p.gameObject);
+                }
+            }            
         }
 
-        public void OnGravitationalPulseForceApplied(Vector3 pullSource, float gravityPull)
+        public void OnGravitationalPulseForceApplied(Vector3 pullSource, float gravityPull, float radius)
         {
             //get the offset between the objects
             Vector3 pullDirection = pullSource - transform.position;
@@ -59,7 +64,7 @@ namespace Assets.Scripts.Planet
             //check distance is more than 0 (to avoid division by 0) and then apply a gravitational force to the object
             //note the force is applied as an acceleration, as acceleration created by gravity is independent of the mass of the object
 
-            if (magsqr <= 0.45f)
+            if (magsqr <= radius)
             {
                 spriteRenderer.enabled = false;
                 rigbody2D.isKinematic = true;
@@ -82,6 +87,7 @@ namespace Assets.Scripts.Planet
         void OnTriggerEnter2D(Collider2D coll)
         {
             GravitySource source = coll.gameObject.GetComponent<GravitySource>();
+            Planet planet = coll.gameObject.GetComponent<Planet>();
             if (source != null)
             {                
                 if(source != null)
@@ -90,6 +96,24 @@ namespace Assets.Scripts.Planet
                     source.OnGravityPulse += OnGravitationalPulseForceApplied; 
                 }
             }
+            else if(planet != null)
+            {
+                AttachPlanets(planet);
+            }
+        }
+
+        private void AttachPlanets(Planet p)
+        {
+            GameObject parent = null;
+            var currentVelocity = this.rigbody2D.velocity;
+            var collidingVelocity = p.rigbody2D.velocity;
+            
+            this.joint.connectedBody = p.rigbody2D;
+               
+            this.joint.enabled = true;
+            this.rigbody2D.velocity = currentVelocity;
+            p.rigbody2D.velocity = currentVelocity;
+
         }
 
         void OnTriggerExit2D(Collider2D coll)
